@@ -3,10 +3,11 @@ import { useState } from 'react'
 import { useQuery } from 'react-query'
 import { Drawer } from '@mui/material'
 import LinearProgress from '@mui/material/LinearProgress'
- import Grid from '@mui/material/Grid'
+import Grid from '@mui/material/Grid'
 import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart'
 import Badge from '@mui/material/Badge'
-import { Wrapper } from './App.styles'
+import { Wrapper } from './styles/App.styles'
+import Item from './components/Item'
 
 // Types
 
@@ -29,12 +30,24 @@ const getProducts = async (): Promise<CartItemType[]> => {
 function App() {
 
   const { data, isLoading, error } = useQuery<CartItemType[]>('products', getProducts)
-  console.log(data)
+
+  const getTotalItems = () => null
+  const addToCart = (clickedItem: CartItemType) => null
+  const removeFromCart = () => null
+
+  if (isLoading) return <LinearProgress />
+  if (error) return <div>Something went wrong!</div>
 
   return (
-    <div className="App">
-      <h1>App</h1>
-    </div>
+    <Wrapper>
+      <Grid container spacing={3}>
+        {data?.map(item => (
+          <Grid item key={item.id} xs={12} sm={4}>
+            <Item item={item} addToCart={addToCart} />
+          </Grid>
+        ))}
+      </Grid>
+    </Wrapper>
   )
 }
 
