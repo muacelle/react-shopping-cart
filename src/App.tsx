@@ -6,8 +6,8 @@ import LinearProgress from '@mui/material/LinearProgress'
 import Grid from '@mui/material/Grid'
 import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart'
 import Badge from '@mui/material/Badge'
-import { Wrapper } from './styles/App.styles'
 import Item from './components/Item'
+import { Wrapper, StyledButton } from './styles/App.styles'
 
 // Types
 
@@ -29,9 +29,15 @@ const getProducts = async (): Promise<CartItemType[]> => {
 
 function App() {
 
+  const [cartOpen, setCartOpen] = useState(false)
+  const [cartItems, setCartItems] = useState([] as CartItemType[])
+
   const { data, isLoading, error } = useQuery<CartItemType[]>('products', getProducts)
 
-  const getTotalItems = () => null
+  const getTotalItems = (items: CartItemType[]) => {
+    return items.reduce((ack: number, item) => ack + item.amount, 0)
+  }
+
   const addToCart = (clickedItem: CartItemType) => null
   const removeFromCart = () => null
 
@@ -40,6 +46,14 @@ function App() {
 
   return (
     <Wrapper>
+      <Drawer anchor='right' open={cartOpen} onClose={() => setCartOpen(false)}>
+        Cart goes here
+      </Drawer>
+      <StyledButton onClick={() => setCartOpen(true)}>
+        <Badge badgeContent={getTotalItems(cartItems)} color='error'>
+          <AddShoppingCartIcon />
+        </Badge>
+      </StyledButton>
       <Grid container spacing={3}>
         {data?.map(item => (
           <Grid item key={item.id} xs={12} sm={4}>
