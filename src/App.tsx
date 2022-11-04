@@ -10,8 +10,6 @@ import Item from './components/Item'
 import { Wrapper, StyledButton } from './styles/App.styles'
 import Cart from './components/Cart'
 
-// Types
-
 export type CartItemType = {
   id: number;
   category: string;
@@ -30,8 +28,10 @@ const getProducts = async (): Promise<CartItemType[]> => {
 
 function App() {
 
+  const localCart = localStorage.getItem('cart')
+
   const [cartOpen, setCartOpen] = useState(false)
-  const [cartItems, setCartItems] = useState([] as CartItemType[])
+  const [cartItems, setCartItems] = useState(JSON.parse(localCart) as CartItemType[])
 
   const { data, isLoading, error } = useQuery<CartItemType[]>('products', getProducts)
 
@@ -41,35 +41,37 @@ function App() {
 
   const addToCart = (clickedItem: CartItemType) => {
 
-    setCartItems(prev => {
-      const isItemInCart = prev.find(item => item.id === clickedItem.id)
+    const isItemInCart = cartItems.find(item => item.id === clickedItem.id)
 
-      if (isItemInCart) {
-        return prev.map(item => (
-          item.id === clickedItem.id ? { ...item, amount: item.amount + 1} : item
-        ))
-      }
-
-      return [...prev, {...clickedItem, amount: 1}]
-    })
+    if (isItemInCart) {
+      const updatedCart = cartItems.map(item => (
+        item.id === clickedItem.id ? {...clickedItem, amount: item.amount + 1} : item
+      ))
+      setCartItems(updatedCart)
+      localStorage.setItem('cart', JSON.stringify(updatedCart))
+    }
+    else {
+      const updatedCart = [...cartItems, {...clickedItem, amount: 1}]
+      setCartItems(updatedCart)
+      localStorage.setItem('cart', JSON.stringify(updatedCart))
+    }
 
   }
 
   const removeFromCart = (id: number) => {
 
-    setCartItems(prev => (
+    const updatedCart = cartItems.reduce((ack, item) => {
+      if (item.id === id) {
+        if (item.amount === 1) return ack
+        return [...ack, { ...item, amount: item.amount - 1 }]
+      }
+      else {
+        return [...ack, item]
+      }
+    }, [] as CartItemType[])
 
-      prev.reduce((ack, item) => {
-        if (item.id === id) {
-          if (item.amount === 1) return ack
-          return [...ack, { ...item, amount: item.amount - 1 }]
-        }
-        else {
-          return [...ack, item]
-        }
-      }, [] as CartItemType[])
-
-    ))
+    setCartItems(updatedCart)
+    localStorage.setItem('cart', JSON.stringify(updatedCart))
 
   }
 
