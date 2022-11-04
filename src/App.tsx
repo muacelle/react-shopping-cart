@@ -8,6 +8,7 @@ import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart'
 import Badge from '@mui/material/Badge'
 import Item from './components/Item'
 import { Wrapper, StyledButton } from './styles/App.styles'
+import Cart from './components/Cart'
 
 // Types
 
@@ -47,7 +48,7 @@ function App() {
   return (
     <Wrapper>
       <Drawer anchor='right' open={cartOpen} onClose={() => setCartOpen(false)}>
-        Cart goes here
+        <Cart cartItems={cartItems} addToCart={addToCart} removeFromCart={removeFromCart}/>
       </Drawer>
       <StyledButton onClick={() => setCartOpen(true)}>
         <Badge badgeContent={getTotalItems(cartItems)} color='error'>
